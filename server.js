@@ -14,11 +14,14 @@ const startServer = async () => {
     const app = express();
 
     // Middleware
-    app.use(cors());
+    app.use(cors({ origin: '*' }));
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
     // Routes
+    app.get('/', (req, res) => {
+      res.send('Backend is running successfully!');
+    });
     app.use("/api/auth", authRoutes);
     app.use("/api/products", productRoutes);
     app.use("/api/orders", orderRoutes); // Add route for orders
