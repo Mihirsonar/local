@@ -8,6 +8,6 @@ router.post('/', authMiddleware(['customer']), createOrder);
 
 router.patch('/orders/:id/status', authMiddleware(['vendor']), updateOrderStatus);
 
-router.get('/orders', authMiddleware(['delivery']), getOrders);
+router.get('/orders', authMiddleware(['customer']), getOrders);
 
 export default router;
