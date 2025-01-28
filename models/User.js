@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ["customer", "vendor", "delivery"], default: "customer" },
+    // cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] 
 });
 
 userSchema.pre("save", async function (next) {

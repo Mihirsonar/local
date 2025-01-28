@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     image: { type: String },  // URL of the product image
     category: { type: String, required: true },  // Example: 'Fruits', 'Vegetables', etc.
-    quantity: { type: Number, required: true },  // Available quantity of the product
+    quantity: { type: String, required: true },  // Available quantity of the product
 }, {
     timestamps: true, // Automatically adds createdAt and updatedAt
 });
