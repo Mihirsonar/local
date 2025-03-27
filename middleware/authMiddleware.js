@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import jwt from 'jsonwebtoken';
 // import User from "../models/User";
 
@@ -106,10 +107,38 @@ const authMiddleware = (roles = []) => {
     } catch (error) {
       console.error('Authentication error:', error.message);
       return res.status(401).json({ message: error.message || 'Authentication failed' });
+=======
+import jwt from 'jsonwebtoken';
+
+const authMiddleware = (roles = []) => {
+  return (req, res, next) => {
+    try {
+      // Extract token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Authentication token is missing or invalid' });
+      }
+
+      const token = authHeader.split(' ')[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded; 
+
+      // Role-based access control
+      if (roles.length && !roles.includes(decoded.role)) {
+        return res.status(403).json({ message: 'Access denied: insufficient permissions' });
+      }
+
+      next(); 
+    } catch (error) {
+      console.error('Authentication error:', error.message);
+      return res.status(401).json({ message: 'Authentication failed' });
+>>>>>>> ac842cea2b00137a3a323ba9dac3f331dbc3a8fd
     }
   };
 };
 
+<<<<<<< HEAD
 // Protect Route Middleware (same as authMiddleware but without role checks)
 const protectRoute = async (req, res, next) => {
   try {
@@ -130,3 +159,6 @@ const protectRoute = async (req, res, next) => {
 };
 
 export { authMiddleware, protectRoute };
+=======
+export default authMiddleware;
+>>>>>>> ac842cea2b00137a3a323ba9dac3f331dbc3a8fd

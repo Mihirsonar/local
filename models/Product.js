@@ -4,11 +4,11 @@ const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    image: { type: String },  // URL of the product image
-    category: { type: String, required: true },  // Example: 'Fruits', 'Vegetables', etc.
-    quantity: { type: String, required: true },  // Available quantity of the product
+    image: { type: String },  
+    category: { type: String, required: true },  
+    quantity: { type: String, required: true },  
 }, {
-    timestamps: true, // Automatically adds createdAt and updatedAt
+    timestamps: true, 
 });
 
 const Product = mongoose.model('Product', productSchema);
