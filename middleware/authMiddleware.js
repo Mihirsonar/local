@@ -1,91 +1,38 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import mongoose from 'mongoose';
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-// Utility function for JWT verification
-const verifyToken = async (token) => {
+export const protect = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
-    
-    if (!user) {
-      throw new Error('User not found');
-    }
-    
-    return user;
-  } catch (error) {
-    throw new Error(error.message || 'Invalid token');
-  }
-};
-
-// Role-based Authentication Middleware
-const authMiddleware = (roles = []) => {
-  return async (req, res, next) => {
-    try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.startsWith('Bearer ') 
-        ? authHeader.split(' ')[1] 
-        : req.cookies?.jwt;
-
-      if (!token) {
-        return res.status(401).json({ message: 'Authentication token is missing or invalid' });
-      }
-
-      const user = await verifyToken(token);
-      req.user = user;
-
-      // Role-based authorization
-      if (roles.length && !roles.includes(user.role)) {
-        return res.status(403).json({ message: 'Access denied: insufficient permissions' });
-      }
-
-      next();
-    } catch (error) {
-      console.error('Authentication error:', error.message);
-      return res.status(401).json({ message: error.message || 'Authentication failed' });
-    }
-  }
-}
-
-// Protect Route Middleware (same as authMiddleware but without role checks)
-const protectRoute = async (req, res, next) => {
-  try {
-    const token = req.cookies?.jwt || req.headers.authorization?.split(' ')[1];
+    const token =
+      req.headers.authorization?.startsWith("Bearer ")
+        ? req.headers.authorization.split(" ")[1]
+        : null;
 
     if (!token) {
-      return res.status(401).json({ message: 'Unauthorized Access!' });
+      return res.status(401).json({ message: "Not authorized" });
     }
 
-    const user = await verifyToken(token);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
     req.user = user;
 
     next();
   } catch (error) {
-    console.error('Protect Route Error:', error.message);
-    return res.status(401).json({ message: error.message || 'Authentication failed' });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 
-export { authMiddleware, protectRoute };
-
-export const verifyJWT = async(req,res,next)=>{
-  const token=
-  req.cookies?.accessToken ||
-  req.header("Authorization")?.replace("Bearer ","");
-
-  if(!token){
-    return res.status(401).json({message:"Unauthorized Access!"});
-  }
-
-  try {
-    const decode = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
-    const user = await User.findById(decode.id).select("-password");
-    req.user = user;
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
     next();
-
-  } catch (error) {
-    return res.status(401).json({message:"Invalid Access Token!"});
-  }
-}
-
-
+  };
+};

@@ -1,14 +1,22 @@
-import {Router} from 'express';
-import { register,login, logout } from '../controllers/authController.js';
-import { registerValidation, loginValidation } from '../Validators/index.js';
-import { validate } from '../middleware/Validator.middleware.js';
-import { verifyJWT } from '../middleware/authMiddleware.js';
+import { Router } from "express";
+import { register, login, logout } from "../controllers/authController.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.route("/register").post(registerValidation(), validate, register);
-router.route("/login").post(loginValidation(), validate, login);
+router.post("/register", register);
+router.post("/login", login);
 
-router.route("/logout").post(verifyJWT,logout);
+router.post("/logout", protect, logout);
+
+// Example protected routes
+router.get("/profile", protect, (req, res) => {
+  res.json(req.user);
+});
+
+// Admin only
+router.get("/admin-test", protect, authorize("admin"), (req, res) => {
+  res.json({ message: "Admin access granted" });
+});
 
 export default router;
