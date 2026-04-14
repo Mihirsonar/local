@@ -1,9 +1,14 @@
-import express from 'express';
-import { register,login } from '../controllers/authController.js';
+import {Router} from 'express';
+import { register,login, logout } from '../controllers/authController.js';
+import { registerValidation, loginValidation } from '../Validators/index.js';
+import { validate } from '../middleware/Validator.middleware.js';
+import { verifyJWT } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const router = Router();
 
-router.post("/register",register);
-router.post("/login",login);
+router.route("/register").post(registerValidation(), validate, register);
+router.route("/login").post(loginValidation(), validate, login);
+
+router.route("/logout").post(verifyJWT,logout);
 
 export default router;

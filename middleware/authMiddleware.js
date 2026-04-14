@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import mongoose from 'mongoose';
 
 // Utility function for JWT verification
 const verifyToken = async (token) => {
@@ -66,3 +67,25 @@ const protectRoute = async (req, res, next) => {
 };
 
 export { authMiddleware, protectRoute };
+
+export const verifyJWT = async(req,res,next)=>{
+  const token=
+  req.cookies?.accessToken ||
+  req.header("Authorization")?.replace("Bearer ","");
+
+  if(!token){
+    return res.status(401).json({message:"Unauthorized Access!"});
+  }
+
+  try {
+    const decode = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decode.id).select("-password");
+    req.user = user;
+    next();
+
+  } catch (error) {
+    return res.status(401).json({message:"Invalid Access Token!"});
+  }
+}
+
+
