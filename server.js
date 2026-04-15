@@ -24,14 +24,14 @@ const startServer = async () => {
     });
     app.use("/api/auth", authRoutes);
     app.use("/api/products", productRoutes);
-    app.use("/api/orders", orderRoutes); // Add route for orders
+    app.use("/api/orders", orderRoutes); 
 
     // Start the server
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (error) {
-    console.error("Failed to start the server:", error.mesclsage);
-    process.exit(1); // Exit the process with failure
+    console.error("Failed to start the server:", error.message);
+    process.exit(1); 
   }
 };
 startServer();
