@@ -8,6 +8,6 @@ router.post('/', protect, createOrder);
 
 router.get('/my', protect, getMyOrders);
 
-router.get("/all-orders", protect, authorize("admin"), getAllOrders);
+router.get("/admin ", protect, authorize("admin"), getAllOrders);
 
 export default router;
