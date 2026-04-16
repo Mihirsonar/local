@@ -18,7 +18,7 @@ const startServer = async () => {
   cors({
     origin: [
       "http://localhost:5173",
-      "https://kirana-omega.vercel.app/"
+      "https://kirana-dovv.vercel.app/"
     ],
     credentials: true,
   })
