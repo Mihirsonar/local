@@ -10,4 +10,8 @@ router.get('/my', protect, getMyOrders);
 
 router.get("/admin ", protect, authorize("admin"), getAllOrders);
 
+router.get("/test", (req, res) => {
+  res.send("Orders route working");
+});
+
 export default router;
