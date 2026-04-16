@@ -9,14 +9,18 @@ if(!Items || !totalAmount || !address){
 }   
 
     const order = new Order({
-        user: req.user._id,
-        Items,
-        totalAmount,
-        address
+      user: req.user._id,
+      products: Items.map((item) => ({
+        product: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalAmount,
+      address,
     });
 
-    await order.save();
-    res.status(201).json({ message: 'Order created successfully', order });
+    const createdOrder = await order.save();
+    res.status(201).json({ message: 'Order created successfully', order: createdOrder });
 } catch (error) {
     console.error('Error creating order:', error);
     res.status(500).json({ error: 'Failed to create order' });
