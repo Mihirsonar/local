@@ -1,6 +1,6 @@
 import Product from "../models/Product.js";
 
-export const addProduct = async (req,res)=>{
+ const addProduct = async (req,res)=>{
     const {name,description,price,image,category,quantity}=req.body;
 
     try {
@@ -18,7 +18,7 @@ export const addProduct = async (req,res)=>{
     }
 } ;
 
-export const getProducts = async (req, res) => {
+ const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
         res.status(200).json(products);
@@ -27,7 +27,7 @@ export const getProducts = async (req, res) => {
     }
 };
 
-export const getProductById = async(req,res)=>{
+ const getProductById = async(req,res)=>{
     const {id} = req.params;
     try {
         const product = await Product.findById(id);
@@ -40,7 +40,7 @@ export const getProductById = async(req,res)=>{
 }
 
 
-export const updateProduct = async(req,res)=>{
+ const updateProduct = async(req,res)=>{
     const {id} = req.params;
     const {name,description,price,image,category,quantity}=req.body;
 
@@ -60,7 +60,7 @@ export const updateProduct = async(req,res)=>{
     }
 };
 
-export const deleteProduct = async (req, res) => {
+ const deleteProduct = async (req, res) => {
     const { id } = req.params;
     try {
         const deletedProduct = await Product.findByIdAndDelete(id);
@@ -70,3 +70,5 @@ export const deleteProduct = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export { addProduct, getProducts, getProductById, updateProduct, deleteProduct };

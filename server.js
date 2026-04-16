@@ -14,7 +14,15 @@ const startServer = async () => {
     const app = express();
 
     // Middleware
-    app.use(cors({ origin: '*' }));
+    app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://kirana-omega.vercel.app/"
+    ],
+    credentials: true,
+  })
+);
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
