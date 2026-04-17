@@ -1,16 +1,20 @@
 import Order from "../models/Order.js";
 import mongoose from "mongoose";
-export const createOrder = async (req,res)=>{
-try {
-    const { Items, totalAmount, address } = req.body;
+export const createOrder = async (req, res) => {
+  try {
+    const { items, totalAmount, address } = req.body;
 
-if(!Items || !totalAmount || !address){
-    return res.status(400).json({ error: 'Items, totalAmount, and address are required' });
-}   
+if (!items || !Array.isArray(items) || items.length === 0) {
+  return res.status(400).json({ error: "Items are required" });
+}
+
+if (!address || !address.street) {
+  return res.status(400).json({ error: "Address is required" });
+}
 
     const order = new Order({
       user: req.user._id,
-      products: Items.map((item) => ({
+      products: items.map((item) => ({
         product: item.productId,
         quantity: item.quantity,
         price: item.price,
@@ -20,11 +24,15 @@ if(!Items || !totalAmount || !address){
     });
 
     const createdOrder = await order.save();
-    res.status(201).json({ message: 'Order created successfully', order: createdOrder });
-} catch (error) {
-    console.error('Error creating order:', error);
-    res.status(500).json({ error: 'Failed to create order' });
-}
+
+    res.status(201).json({
+      message: "Order created successfully",
+      order: createdOrder,
+    });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: "Failed to create order" });
+  }
 };
 
 export const getMyOrders = async (req, res) => {
