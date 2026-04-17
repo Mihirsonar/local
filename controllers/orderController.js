@@ -4,21 +4,19 @@ export const createOrder = async (req, res) => {
   try {
     const { items, totalAmount, address } = req.body;
 
-if (!items || !Array.isArray(items) || items.length === 0) {
-  return res.status(400).json({ error: "Items are required" });
-}
+    console.log("REQ BODY:", req.body);
 
-if (!address || !address.street) {
-  return res.status(400).json({ error: "Address is required" });
-}
+    const mappedProducts = items.map((item) => ({
+      product: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    console.log("MAPPED PRODUCTS:", mappedProducts);
 
     const order = new Order({
       user: req.user._id,
-      products: items.map((item) => ({
-        product: item.productId,
-        quantity: item.quantity,
-        price: item.price,
-      })),
+      products: mappedProducts,
       totalAmount,
       address,
     });
