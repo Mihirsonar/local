@@ -37,7 +37,7 @@ export const getMyOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id })
       .sort({ createdAt: -1 })
-      .populate("orderItems.product", "name image price");
+      .populate("products.product", "name image price");
 
     res.json(orders);
   } catch (error) {

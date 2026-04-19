@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/', protect, createOrder);
 
-router.get('/my', getMyOrders);
+router.get('/my',protect,getMyOrders);
 
 router.get('/admin', protect, authorize("admin"), getAllOrders);
 
