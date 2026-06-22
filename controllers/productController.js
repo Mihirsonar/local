@@ -1,4 +1,5 @@
 import Product from "../models/Product.js";
+import XLSX from "xlsx";
 
  const addProduct = async (req,res)=>{
     const {name,description,price,image,category,quantity}=req.body;
@@ -71,4 +72,47 @@ import Product from "../models/Product.js";
     }
 };
 
-export { addProduct, getProducts, getProductById, updateProduct, deleteProduct };
+const bulkAddProducts = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please upload an Excel file",
+      });
+    }
+
+    const workbook = XLSX.read(req.file.buffer, {
+      type: "buffer",
+    });
+
+    const sheetName = workbook.SheetNames[0];
+
+    const sheet = workbook.Sheets[sheetName];
+
+    const products = XLSX.utils.sheet_to_json(sheet);
+
+    const formattedProducts = products.map((product) => ({
+      name: product.name,
+      description: product.description,
+      price: Number(product.price),
+      image: product.image,
+      category: product.category,
+      quantity: Number(product.quantity),
+    }));
+
+    const insertedProducts = await Product.insertMany(
+      formattedProducts
+    );
+
+    res.status(201).json({
+      message: "Products added successfully",
+      totalProducts: insertedProducts.length,
+      products: insertedProducts,
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: err.message,
+    });
+  }
+};
+
+export { addProduct, getProducts, getProductById, updateProduct, deleteProduct, bulkAddProducts };
