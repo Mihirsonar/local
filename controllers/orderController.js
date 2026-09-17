@@ -8,122 +8,122 @@ dotenv.config();
 
 const razorpay = new Razorpay({ key_id: process.env.RAZORPAY_KEY, key_secret: process.env.RAZORPAY_KEY_SECRET })
 
-export const createRazorpayOrder = async(req,res)=>{
+export const createRazorpayOrder = async (req, res) => {
 
-try{
+  try {
 
-const {totalAmount}=req.body;
+    const { totalAmount } = req.body;
 
-const options={
-    amount:Math.round(totalAmount*100),
-    currency:"INR",
-    receipt:`receipt_${Date.now()}`
+    const options = {
+      amount: Math.round(totalAmount * 100),
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`
+    };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+
+    res.status(200).json({
+      success: true,
+      order: razorpayOrder
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to create payment order"
+    });
+
+  }
+
 };
 
-const razorpayOrder=await razorpay.orders.create(options);
+export const verifyPayment = async (req, res) => {
 
-res.status(200).json({
-    success:true,
-    order:razorpayOrder
-});
+  try {
 
-}catch(error){
+    const {
 
-console.log(error);
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
 
-res.status(500).json({
-    success:false,
-    message:"Unable to create payment order"
-});
+      items,
+      totalAmount,
+      address
 
-}
+    } = req.body;
 
-};
+    const body =
+      razorpay_order_id + "|" + razorpay_payment_id;
 
-export const verifyPayment = async(req,res)=>{
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest("hex");
 
-try{
+    if (expectedSignature !== razorpay_signature) {
 
-const {
+      return res.status(400).json({
+        success: false,
+        message: "Payment Verification Failed"
+      });
 
-razorpay_order_id,
-razorpay_payment_id,
-razorpay_signature,
+    }
 
-items,
-totalAmount,
-address
+    const mappedProducts = items.map(item => ({
 
-}=req.body;
+      product: item.productId,
+      quantity: item.quantity,
+      price: item.price
 
-const body=
-razorpay_order_id + "|" + razorpay_payment_id;
+    }));
 
-const expectedSignature=crypto
-.createHmac("sha256",process.env.RAZORPAY_KEY_SECRET)
-.update(body.toString())
-.digest("hex");
+    const order = new Order({
 
-if(expectedSignature!==razorpay_signature){
+      user: req.user._id,
 
-return res.status(400).json({
-success:false,
-message:"Payment Verification Failed"
-});
+      products: mappedProducts,
 
-}
+      totalAmount,
 
-const mappedProducts=items.map(item=>({
+      address,
 
-product:item.productId,
-quantity:item.quantity,
-price:item.price
+      paymentStatus: "Paid",
 
-}));
+      paymentMethod: "Razorpay",
 
-const order=new Order({
+      razorpayOrderId: razorpay_order_id,
 
-user:req.user._id,
+      razorpayPaymentId: razorpay_payment_id,
 
-products:mappedProducts,
+      razorpaySignature: razorpay_signature
 
-totalAmount,
+    });
 
-address,
+    await order.save();
 
-paymentStatus:"Paid",
+    res.status(201).json({
 
-paymentMethod:"Razorpay",
+      success: true,
+      message: "Payment Successful",
 
-razorpayOrderId:razorpay_order_id,
+      order
 
-razorpayPaymentId:razorpay_payment_id,
+    });
 
-razorpaySignature:razorpay_signature
+  } catch (error) {
 
-});
+    console.log(error);
 
-await order.save();
+    res.status(500).json({
+      success: false,
+      message: "Payment Verification Failed"
+    });
 
-res.status(201).json({
-
-success:true,
-message:"Payment Successful",
-
-order
-
-});
-
-}catch(error){
-
-console.log(error);
-
-res.status(500).json({
-success:false,
-message:"Payment Verification Failed"
-});
-
-}
+  }
 
 };
 
@@ -131,15 +131,12 @@ export const createOrder = async (req, res) => {
   try {
     const { items, totalAmount, address } = req.body;
 
-    console.log("REQ BODY:", req.body);
-
     const mappedProducts = items.map((item) => ({
       product: item.productId,
       quantity: item.quantity,
       price: item.price,
     }));
 
-    console.log("MAPPED PRODUCTS:", mappedProducts);
 
     const order = new Order({
       user: req.user._id,
@@ -177,7 +174,7 @@ export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .sort({ createdAt: -1 })
-       .populate("user", "name")
+      .populate("user", "name")
       .populate("products.product", "name");
 
     res.status(200).json({ orders });
