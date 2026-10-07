@@ -53,6 +53,12 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    if (!user.password) {
+      return res.status(400).json({
+        message: "This account uses Google Sign-In. Please sign in with Google.",
+      });
+    }
+
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
@@ -76,6 +82,54 @@ const login = async (req, res) => {
   }
 };
 
+// GOOGLE LOGIN / REGISTER
+const googleLogin = async (req, res) => {
+  try {
+    const { name, email, googleId, picture } = req.body;
+
+    if (!email || !googleId) {
+      return res.status(400).json({ message: "Invalid Google credentials" });
+    }
+
+    // Find existing user by email
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // If found but no googleId, link the Google account
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.picture = picture;
+        await user.save();
+      }
+    } else {
+      // Create new user without password
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        picture,
+        password: null,
+      });
+    }
+
+    const token = user.generateToken();
+
+    res.status(200).json({
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        picture: user.picture,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // LOGOUT (client-side mainly)
 const logout = async (req, res) => {
   res.status(200).json({ message: "Logout successful" });
@@ -88,4 +142,4 @@ const getCurrentUser = async (req, res) => {
   });
 };
 
-export { register, login, logout, getCurrentUser };
+export { register, login, logout, getCurrentUser, googleLogin };

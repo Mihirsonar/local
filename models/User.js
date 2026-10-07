@@ -6,7 +6,10 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false, default: null }, // optional for Google users
+
+    googleId: { type: String, default: null },
+    picture: { type: String, default: null },
 
     role: {
       type: String,
@@ -17,9 +20,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Only hash password if it exists and was modified
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
+  if (!this.password || !this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });

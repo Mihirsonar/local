@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { register, login, logout } from "../controllers/authController.js";
+import { register, login, logout, googleLogin } from "../controllers/authController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/google", googleLogin);
 
 router.post("/logout", protect, logout);
 
