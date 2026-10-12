@@ -1,12 +1,19 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+const addressSchema = new mongoose.Schema({
+  label: { type: String, default: "Home" },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  zip: { type: String, required: true },
+}, { _id: true });
 
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: false, default: null }, // optional for Google users
+    password: { type: String, required: false, default: null },
 
     googleId: { type: String, default: null },
     picture: { type: String, default: null },
@@ -16,6 +23,9 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "admin"],
       default: "customer",
     },
+
+    addresses: { type: [addressSchema], default: [] },
+    defaultAddress: { type: mongoose.Schema.Types.ObjectId, ref: "User.addresses", default: null },
   },
   { timestamps: true }
 );

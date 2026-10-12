@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { register, login, logout, googleLogin } from "../controllers/authController.js";
+﻿import { Router } from "express";
+import { register, login, logout, googleLogin, getAddresses, saveAddresses } from "../controllers/authController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -20,4 +20,9 @@ router.get("/admin-test", protect, authorize("admin"), (req, res) => {
   res.json({ message: "Admin access granted" });
 });
 
+// Address routes (protected)
+router.get("/addresses", protect, getAddresses);
+router.post("/addresses", protect, saveAddresses);
+
 export default router;
+

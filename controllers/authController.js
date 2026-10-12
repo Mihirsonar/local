@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+﻿import User from "../models/User.js";
 
 // REGISTER
 const register = async (req, res) => {
@@ -142,4 +142,40 @@ const getCurrentUser = async (req, res) => {
   });
 };
 
-export { register, login, logout, getCurrentUser, googleLogin };
+
+// GET USER ADDRESSES
+const getAddresses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("addresses defaultAddress");
+    res.status(200).json({ addresses: user.addresses, defaultAddress: user.defaultAddress });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// SAVE / UPDATE ADDRESSES
+const saveAddresses = async (req, res) => {
+  try {
+    const { addresses, defaultAddressId } = req.body;
+    if (!Array.isArray(addresses)) {
+      return res.status(400).json({ message: "addresses must be an array" });
+    }
+
+    const user = await User.findById(req.user._id);
+    user.addresses = addresses;
+    if (defaultAddressId !== undefined) {
+      user.defaultAddress = defaultAddressId || null;
+    }
+    await user.save();
+
+    res.status(200).json({
+      message: "Addresses saved",
+      addresses: user.addresses,
+      defaultAddress: user.defaultAddress,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export { register, login, logout, getCurrentUser, googleLogin, getAddresses, saveAddresses };
+
