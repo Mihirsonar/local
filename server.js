@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import bodyParser from "body-parser";
 import cors from "cors";
 
@@ -35,6 +36,7 @@ const startServer = async () => {
     app.use("/api/products", productRoutes);
     app.use("/api/orders", orderRoutes);
     app.use("/api/notifications", notificationRoutes);
+    app.use("/api/admin", adminRoutes);
 
     // Start the server
     const PORT = process.env.PORT || 5000;
