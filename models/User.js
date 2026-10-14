@@ -25,6 +25,15 @@ const userSchema = new mongoose.Schema(
     },
 
     addresses: { type: [addressSchema], default: [] },
+    pushSubscriptions: [{
+      endpoint: { type: String, required: true },
+      expirationTime: { type: Number, default: null },
+      keys: {
+        p256dh: { type: String, required: true },
+        auth: { type: String, required: true },
+      },
+      createdAt: { type: Date, default: Date.now },
+    }],
     defaultAddress: { type: mongoose.Schema.Types.ObjectId, ref: "User.addresses", default: null },
   },
   { timestamps: true }

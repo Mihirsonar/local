@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import bodyParser from "body-parser";
 import cors from "cors";
 
@@ -15,15 +16,14 @@ const startServer = async () => {
 
     // Middleware
     app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://kirana-dovv.vercel.app"
-      
-    ],
-    credentials: true,
-  })
-);
+      cors({
+        origin: [
+          "http://localhost:5173",
+          "https://kirana-dovv.vercel.app"
+        ],
+        credentials: true,
+      })
+    );
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -33,7 +33,8 @@ const startServer = async () => {
     });
     app.use("/api/auth", authRoutes);
     app.use("/api/products", productRoutes);
-    app.use("/api/orders", orderRoutes); 
+    app.use("/api/orders", orderRoutes);
+    app.use("/api/notifications", notificationRoutes);
 
     // Start the server
     const PORT = process.env.PORT || 5000;
