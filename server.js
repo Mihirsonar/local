@@ -20,7 +20,8 @@ const startServer = async () => {
       cors({
         origin: [
           "http://localhost:5173",
-          "https://kirana-dovv.vercel.app"
+          "https://kirana-dovv.vercel.app",
+          "https://kirana-omega.vercel.app"
         ],
         credentials: true,
       })
@@ -43,7 +44,7 @@ const startServer = async () => {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (error) {
     console.error("Failed to start the server:", error.message);
-    process.exit(1); 
+    process.exit(1);
   }
 };
 startServer();
